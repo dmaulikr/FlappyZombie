@@ -3,12 +3,17 @@ package ve.com.edgaralexanderfr.game;
 import java.awt.Image;
 
 public abstract class GameObject {
+	protected Game game           = null;
 	protected long id             = 0;
 	protected float x             = 0.0f;
 	protected float y             = 0.0f;
 	protected short zIndex        = 0;
 	protected Image spriteTexture = null;
 	protected String text         = null;
+
+	public Game getGame () {
+		return this.game;
+	}
 
 	public long getId () {
 		return this.id;
@@ -32,6 +37,10 @@ public abstract class GameObject {
 
 	public String getText () {
 		return this.text;
+	}
+
+	public void setGame (Game game) {
+		this.game = game;
 	}
 
 	public void setId (long id) {
@@ -58,7 +67,12 @@ public abstract class GameObject {
 		this.text = text;
 	}
 
-	public abstract void start(Game game);
+	public void destroy () {
+		if (this.game != null) {
+			this.game.destroy(this);
+		}
+	}
 
-	public abstract void update(Game game);
+	public abstract void start ();
+	public abstract void update ();
 }

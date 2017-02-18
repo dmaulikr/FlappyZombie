@@ -6,6 +6,10 @@ import ve.com.edgaralexanderfr.net.UDPEvents;
 import ve.com.edgaralexanderfr.net.UDPHost;
 import ve.com.edgaralexanderfr.net.UDPServer;
 
+import ve.com.edgaralexanderfr.game.Game;         //
+import ve.com.edgaralexanderfr.game.GameObject;   //
+import ve.com.edgaralexanderfr.game.Renderer;     //
+
 public class Main implements UDPEvents {
 	private Scanner scanner = new Scanner(System.in);
 

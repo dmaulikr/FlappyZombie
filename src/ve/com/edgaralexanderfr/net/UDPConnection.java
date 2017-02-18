@@ -323,14 +323,16 @@ public abstract class UDPConnection implements Runnable, TimerEvent {
 	protected abstract void onDisconnect (UDPHost udpHost);
 
 	private synchronized void monitorConnections () {
-		long now = Timer.now();
-		int size = this.connectedHosts.size();
+		long now                 = Timer.now();
+		UDPHost[] connectedHosts = new UDPHost[ this.connectedHosts.size() ];
+		this.connectedHosts.toArray(connectedHosts);
+		int length               = connectedHosts.length;
 		int i;
 		UDPHost udpHost;
 		long lastPacketElapsedTime;
 
-		for (i = 0; i < size; i++) {
-			udpHost               = this.connectedHosts.get(i);
+		for (i = 0; i < length; i++) {
+			udpHost               = connectedHosts[ i ];
 			lastPacketElapsedTime = now - udpHost.getLastPacketTime();
 
 			if (lastPacketElapsedTime >= this.hostTimeoutTime) {
@@ -340,12 +342,14 @@ public abstract class UDPConnection implements Runnable, TimerEvent {
 	}
 
 	private synchronized void updateTimeouts () {
-		int size = this.timeouts.size();
+		Count[] timeouts = new Count[ this.timeouts.size() ];
+		this.timeouts.toArray(timeouts);
+		int length = timeouts.length;
 		int i;
 		Count count;
 
-		for (i = 0; i < size; i++) {
-			count = this.timeouts.get(i);
+		for (i = 0; i < length; i++) {
+			count = timeouts[ i ];
 			count.count();
 
 			if (count.isCompleted()) {
@@ -404,13 +408,15 @@ public abstract class UDPConnection implements Runnable, TimerEvent {
 	}
 
 	private synchronized void recycleOldPacketsParts () {
-		long now = Timer.now();
-		int size = this.packetsParts.size();
+		long now                     = Timer.now();
+		UDPPacketPart[] packetsParts = new UDPPacketPart[ this.packetsParts.size() ];
+		this.packetsParts.toArray(packetsParts);
+		int length                   = packetsParts.length;
 		int i;
 		UDPPacketPart part;
 
-		for (i = 0; i < size; i++) {
-			part = this.packetsParts.get(i);
+		for (i = 0; i < length; i++) {
+			part = packetsParts[ i ];
 
 			if ((now - part.getReceptionTime()) >= this.packetPartRecyclingTime) {
 				this.packetsParts.remove(part);
