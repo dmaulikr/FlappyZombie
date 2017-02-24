@@ -8,9 +8,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Game {
-	private long lastId                   = -1;
-	private List<GameObject> gameObjects  = new ArrayList<GameObject>();
-	private List<GameObject> destroyQueue = new ArrayList<GameObject>();
+	private long lastId                  = -1;
+	private List<GameObject> gameObjects = new ArrayList<GameObject>();
 
 	public long getLastId () {
 		return this.lastId;

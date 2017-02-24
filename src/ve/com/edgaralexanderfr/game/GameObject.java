@@ -3,13 +3,29 @@ package ve.com.edgaralexanderfr.game;
 import java.awt.Image;
 
 public abstract class GameObject {
-	protected Game game           = null;
-	protected long id             = 0;
-	protected float x             = 0.0f;
-	protected float y             = 0.0f;
-	protected short zIndex        = 0;
-	protected Image spriteTexture = null;
-	protected String text         = null;
+	public static final byte PIVOT_TOP_LEFT     = 0;
+	public static final byte PIVOT_TOP          = 1;
+	public static final byte PIVOT_TOP_RIGHT    = 2;
+	public static final byte PIVOT_LEFT         = 3;
+	public static final byte PIVOT_CENTER       = 4;
+	public static final byte PIVOT_RIGHT        = 5;
+	public static final byte PIVOT_BOTTOM_LEFT  = 6;
+	public static final byte PIVOT_BOTTOM       = 7;
+	public static final byte PIVOT_BOTTOM_RIGHT = 8;
+
+	protected Game game                         = null;
+	protected long id                           = 0;
+	protected float x                           = 0.0f;
+	protected float y                           = 0.0f;
+	protected short zIndex                      = 0;
+	protected float spriteTextureOffsetX        = 0.0f;
+	protected float spriteTextureOffsetY        = 0.0f;
+	protected byte spriteTexturePivot           = PIVOT_CENTER;
+	protected float textOffsetX                 = 0.0f;
+	protected float textOffsetY                 = 0.0f;
+	protected byte textPivot                    = PIVOT_CENTER;
+	protected Image spriteTexture               = null;
+	protected String text                       = null;
 
 	public Game getGame () {
 		return this.game;
@@ -31,12 +47,53 @@ public abstract class GameObject {
 		return this.zIndex;
 	}
 
+	public float getSpriteTextureOffsetX () {
+		return this.spriteTextureOffsetX;
+	}
+
+	public float getSpriteTextureOffsetY () {
+		return this.spriteTextureOffsetY;
+	}
+
+	public byte getSpriteTexturePivot () {
+		return this.spriteTexturePivot;
+	}
+
+	public float getTextOffsetX () {
+		return this.textOffsetX;
+	}
+
+	public float getTextOffsetY () {
+		return this.textOffsetY;
+	}
+
+	public byte getTextPivot () {
+		return this.textPivot;
+	}
+
 	public Image getSpriteTexture () {
 		return this.spriteTexture;
 	}
 
 	public String getText () {
 		return this.text;
+	}
+
+	public Coords2D getSpriteTextureFinalCoordinates () {
+		float width, height;
+
+		if (this.spriteTexture == null) {
+			width = height = 0.0f;
+		} else {
+			width  = (float) this.spriteTexture.getWidth(null);
+			height = (float) this.spriteTexture.getHeight(null);
+		}
+
+		Coords2D coordinates = calculateCoordinatesDifference(this.spriteTextureOffsetX, this.spriteTextureOffsetY, this.spriteTexturePivot, width, height);
+		coordinates.x       += this.x;
+		coordinates.y       += this.y;
+
+		return coordinates;
 	}
 
 	public void setGame (Game game) {
@@ -59,12 +116,87 @@ public abstract class GameObject {
 		this.zIndex = zIndex;
 	}
 
+	public void setSpriteTextureOffsetX (float spriteTextureOffsetX) {
+		this.spriteTextureOffsetX = spriteTextureOffsetX;
+	}
+
+	public void setSpriteTextureOffsetY (float spriteTextureOffsetY) {
+		this.spriteTextureOffsetY = spriteTextureOffsetY;
+	}
+
+	public void setSpriteTexturePivot (byte spriteTexturePivot) {
+		if (spriteTexturePivot >= PIVOT_TOP_LEFT && spriteTexturePivot <= PIVOT_BOTTOM_RIGHT) {
+			this.spriteTexturePivot = spriteTexturePivot;
+		}
+	}
+
+	public void setTextOffsetX (float textOffsetX) {
+		this.textOffsetX = textOffsetX;
+	}
+
+	public void setTextOffsetY (float textOffsetY) {
+		this.textOffsetY = textOffsetY;
+	}
+
+	public void setTextPivot (byte textPivot) {
+		if (textPivot >= PIVOT_TOP_LEFT && textPivot <= PIVOT_BOTTOM_RIGHT) {
+			this.textPivot = textPivot;
+		}
+	}
+
 	public void setSpriteTexture (Image spriteTexture) {
 		this.spriteTexture = spriteTexture;
 	}
 
 	public void setText (String text) {
 		this.text = text;
+	}
+
+	public static Coords2D calculateCoordinatesDifference (float offsetX, float offsetY, byte pivot, float width, float height) {
+		float halfWidth  = width  / 2;
+		float halfHeight = height / 2;
+		float x, y;
+
+		switch (pivot) {
+			case PIVOT_TOP_LEFT     : {
+				x = 0.0f;
+				y = 0.0f;
+			} break;
+			case PIVOT_TOP          : {
+				x = -halfWidth;
+				y = 0.0f;
+			} break;
+			case PIVOT_TOP_RIGHT    : {
+				x = -width;
+				y = 0.0f;
+			} break;
+			case PIVOT_LEFT         : {
+				x = 0.0f;
+				y = -halfHeight;
+			} break;
+			case PIVOT_RIGHT        : {
+				x = -width;
+				y = -halfHeight;
+			} break;
+			case PIVOT_BOTTOM_LEFT  : {
+				x = 0.0f;
+				y = -height;
+			} break;
+			case PIVOT_BOTTOM       : {
+				x = -halfWidth;
+				y = -height;
+			} break;
+			case PIVOT_BOTTOM_RIGHT : {
+				x = -width;
+				y = -height;
+			} break;
+			default                 : {
+				x = -halfWidth;
+				y = -halfHeight;
+			}
+		}
+
+		return new Coords2D(x + offsetX, y + offsetY);
 	}
 
 	public void destroy () {

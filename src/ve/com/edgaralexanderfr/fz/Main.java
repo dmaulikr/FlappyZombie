@@ -1,79 +1,38 @@
 package ve.com.edgaralexanderfr.fz;
 
-import java.util.Scanner;
-import ve.com.edgaralexanderfr.net.UDPClient;
-import ve.com.edgaralexanderfr.net.UDPEvents;
-import ve.com.edgaralexanderfr.net.UDPHost;
-import ve.com.edgaralexanderfr.net.UDPServer;
+import java.awt.Image;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 
-import ve.com.edgaralexanderfr.game.Game;         //
-import ve.com.edgaralexanderfr.game.GameObject;   //
-import ve.com.edgaralexanderfr.game.Renderer;     //
+import ve.com.edgaralexanderfr.game.Dog;
+import ve.com.edgaralexanderfr.game.Game;
+import ve.com.edgaralexanderfr.game.GameObject;
+import ve.com.edgaralexanderfr.game.Renderer;
 
-public class Main implements UDPEvents {
-	private Scanner scanner = new Scanner(System.in);
+public class Main {
+	public Main () {
+		ImageIcon imageIcon = new ImageIcon("dog.png");
+		Image image         = imageIcon.getImage();
+		Game game           = new Game();
+		Renderer renderer   = new Renderer(game);
+		JFrame jFrame       = new JFrame("Flappy Zombie");
+		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		jFrame.setSize(640, 360);
+		jFrame.setResizable(false);
+		jFrame.setLocationRelativeTo(null);
+		jFrame.add(renderer);
+		jFrame.setVisible(true);
+		
+		try {
+			Dog dog = game.instantiate(Dog.class, 0.0f, 0.0f, (short) 0, image);
+			dog.setSpriteTexturePivot(GameObject.PIVOT_TOP_LEFT);
+			renderer.repaint();
+		} catch (Exception exception) {
+			exception.printStackTrace();
+		}
+	}
 
-	public static void main (String[] args) throws Exception {
+	public static void main (String[] args) {
 		new Main();
-	}
-
-	public Main () throws Exception {
-		System.out.println("Type y for UDP server: ");
-		String type = this.scanner.next();
-
-		if (type.equals("y")) {
-			this.startUDPServer();
-		} else {
-			this.startUDPClient();
-		}
-	}
-
-	@Override
-	public void onConnect (UDPHost udpHost) {
-		System.out.println("Connected to " + udpHost.getInetAddress().getHostAddress() + ":" + udpHost.getPort() + ".");
-	}
-
-	@Override
-	public void onConnectionTimeout () {
-		System.out.println("Failed to connect to remote host.");
-	}
-
-	@Override
-	public void onContentReceived (UDPHost udpHost, byte[] content) {
-		System.out.println(udpHost.getInetAddress().getHostAddress() + ":" + udpHost.getPort() + ": " + new String(content));
-	}
-
-	@Override
-	public void onPong (UDPHost udpHost, long ping) {
-		System.out.println(udpHost.getInetAddress().getHostAddress() + ":" + udpHost.getPort() + " PING: " + ping);
-	}
-
-	@Override
-	public void onDisconnect (UDPHost udpHost) {
-		System.out.println(udpHost.getInetAddress().getHostAddress() + ":" + udpHost.getPort() + " has been disconnected.");
-	}
-
-	private void startUDPServer () throws Exception {
-		try {
-			System.out.println("Port: ");
-			int port         = Integer.parseInt(this.scanner.next());
-			UDPServer server = new UDPServer(this);
-			server.listen(port);
-		} catch (Exception exception) {
-			exception.printStackTrace();
-		}
-	}
-
-	private void startUDPClient () throws Exception {
-		try {
-			System.out.println("Remote IP Address: ");
-			String remoteIPAddress = this.scanner.next();
-			System.out.println("Remote port: ");
-			int remotePort         = Integer.parseInt(this.scanner.next());
-			UDPClient client       = new UDPClient(this);
-			client.connect(remoteIPAddress, remotePort);
-		} catch (Exception exception) {
-			exception.printStackTrace();
-		}
 	}
 }

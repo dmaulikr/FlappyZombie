@@ -28,10 +28,12 @@ public class Renderer extends JPanel {
 
 		this.game.update();
 		GameObject[] gameObjects = this.game.getSortedGameObjects();
-		
+		Coords2D coordinates;
+
 		for (GameObject gameObject : gameObjects) {
 			if (gameObject.getSpriteTexture() != null) {
-				g.drawImage(gameObject.getSpriteTexture(), (int) gameObject.getX(), (int) gameObject.getY(), null);
+				coordinates = gameObject.getSpriteTextureFinalCoordinates();
+				g.drawImage(gameObject.getSpriteTexture(), coordinates.getRoundedX(), coordinates.getRoundedY(), null);
 			}
 		}
 	}
