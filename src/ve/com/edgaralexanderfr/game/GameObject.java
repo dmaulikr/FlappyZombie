@@ -1,5 +1,6 @@
 package ve.com.edgaralexanderfr.game;
 
+import java.awt.Graphics;
 import java.awt.Image;
 
 public abstract class GameObject {
@@ -90,6 +91,14 @@ public abstract class GameObject {
 		}
 
 		Coords2D coordinates = calculateCoordinatesDifference(this.spriteTextureOffsetX, this.spriteTextureOffsetY, this.spriteTexturePivot, width, height);
+		coordinates.x       += this.x;
+		coordinates.y       += this.y;
+
+		return coordinates;
+	}
+
+	public Coords2D getTextFinalCoordinates (float width, float height) {
+		Coords2D coordinates = calculateCoordinatesDifference(this.textOffsetX, this.textOffsetY, this.textPivot, width, height);
 		coordinates.x       += this.x;
 		coordinates.y       += this.y;
 
@@ -205,6 +214,7 @@ public abstract class GameObject {
 		}
 	}
 
+	public abstract void onTextFormatting (Graphics g);
 	public abstract void start ();
 	public abstract void update ();
 }
