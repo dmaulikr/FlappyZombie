@@ -14,23 +14,23 @@ public class Main {
 	private static final String RESOURCES_FILE_PATH = "/res/text/Resources.txt";
 
 	public Main () {
-		Resources resources = new Resources(RESOURCES_FILE_PATH);
-		Input input         = new Input();
-		Game game           = new Game(resources, input);
-		Renderer renderer   = new Renderer(game);
-		PropertiesReader c  = resources.get("config", PropertiesReader.class);
-		JFrame jFrame       = new JFrame(c.s("windowTitle"));
+		Resources resources     = new Resources(RESOURCES_FILE_PATH);
+		Input input             = new Input();
+		Game game               = new Game(resources, input);
+		Renderer renderer       = new Renderer(game);
+		PropertiesReader config = resources.get("config", PropertiesReader.class);
+		renderer.addMouseListener(input);
+		renderer.addMouseMotionListener(input);
+		game.instantiate(Level.class, 0.0f, 0.0f, (short) 0, (Image) null);
+		renderer.start((byte) config.i("fps"));
+		JFrame jFrame           = new JFrame(config.s("windowTitle"));
 		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		jFrame.setSize(c.i("windowWidth"), c.i("windowHeight"));
+		jFrame.setSize(config.i("windowWidth"), config.i("windowHeight"));
 		jFrame.setResizable(false);
 		jFrame.setLocationRelativeTo(null);
 		jFrame.add(renderer);
 		jFrame.addKeyListener(input);
 		jFrame.setVisible(true);
-		renderer.addMouseListener(input);
-		renderer.addMouseMotionListener(input);
-		game.instantiate(Level.class, 0.0f, 0.0f, (short) 0, (Image) null);
-		renderer.start((byte) c.i("fps"));
 	}
 
 	public static void main (String[] args) {

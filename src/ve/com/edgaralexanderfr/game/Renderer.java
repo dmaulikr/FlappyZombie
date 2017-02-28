@@ -3,22 +3,29 @@ package ve.com.edgaralexanderfr.game;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
+import javax.swing.Timer;
 
 import ve.com.edgaralexanderfr.util.GraphicsTools;
-import ve.com.edgaralexanderfr.util.Timer;
-import ve.com.edgaralexanderfr.util.TimerEvent;
 
-public class Renderer extends JPanel implements TimerEvent {
-	private Game game             = null;
-	private long lastFrameTime    = -1;
-	private long currentFrameTime = 0;
-	private float fpsElapsedTime  = 0.0f;
-	private int frameCount        = 0;
-	private int fps               = 0;
-	private Timer timer           = null;
-	private short time            = (short) Math.round(1000 / 24);
+public class Renderer extends JPanel implements ActionListener {
+	public static final long serialVersionUID        = 42l;
+
+	private Game game                                = null;
+	private long lastFrameTime                       = -1;
+	private long currentFrameTime                    = 0;
+	private float fpsElapsedTime                     = 0.0f;
+	private int frameCount                           = 0;
+	private int fps                                  = 0;
+	private Timer timer                              = null;
+	private short time                               = (short) Math.round(1000 / 24);
+	private List<ScheduledRoutine> scheduledRoutines = new ArrayList<ScheduledRoutine>();
 
 	public Game getGame () {
 		return this.game;
@@ -77,8 +84,9 @@ public class Renderer extends JPanel implements TimerEvent {
 			return;
 		}
 
-		this.currentFrameTime    = Timer.now();
+		this.currentFrameTime    = ve.com.edgaralexanderfr.util.Timer.now();
 		this.fpsElapsedTime     += this.deltaTime();
+		this.updateScheduledRoutines();
 		this.game.update();
 		this.lastFrameTime       = this.currentFrameTime;
 		GameObject[] gameObjects = this.game.getSortedGameObjects();
@@ -100,6 +108,10 @@ public class Renderer extends JPanel implements TimerEvent {
 			}
 		}
 
+		if (this.game.getInput() != null) {
+			this.game.getInput().updatePending();
+		}
+
 		this.frameCount++;
 
 		if (this.fpsElapsedTime >= 1.0f) {
@@ -110,7 +122,7 @@ public class Renderer extends JPanel implements TimerEvent {
 	}
 
 	@Override
-	public void onTick (Timer timer) {
+	public void actionPerformed (ActionEvent e) {
 		this.repaint();
 	}
 
@@ -124,7 +136,13 @@ public class Renderer extends JPanel implements TimerEvent {
 		}
 
 		this.lastFrameTime = -1;
-		this.timer         = Timer.setInterval(this.time, this);
+
+		if (this.game != null && this.game.getInput() != null) {
+			this.game.getInput().reset();
+		}
+
+		this.timer = new Timer(this.time, this);
+		this.timer.start();
 	}
 
 	public void start (byte fps) {
@@ -134,8 +152,37 @@ public class Renderer extends JPanel implements TimerEvent {
 
 	public synchronized void stop () {
 		if (this.timer != null) {
-			this.timer.setCancelled(true);
+			this.timer.stop();
 			this.timer = null;
+		}
+	}
+
+	public synchronized void invoke (ScheduledRoutine scheduledRoutine) {
+		if (scheduledRoutine != null) {
+			this.scheduledRoutines.add(scheduledRoutine);
+		}
+	}
+
+	public synchronized void cancelInvoke (String name) {
+		for (ScheduledRoutine scheduledRoutine : this.scheduledRoutines) {
+			if (scheduledRoutine.getName().equals(name)) {
+				this.scheduledRoutines.remove(scheduledRoutine);
+
+				break;
+			}
+		}
+	}
+
+	private synchronized void updateScheduledRoutines () {
+		ScheduledRoutine[] scheduledRoutines = new ScheduledRoutine[ this.scheduledRoutines.size() ];
+		this.scheduledRoutines.toArray(scheduledRoutines);
+
+		for (ScheduledRoutine scheduledRoutine : scheduledRoutines) {
+			scheduledRoutine.update();
+
+			if (scheduledRoutine.isCompleted()) {
+				this.scheduledRoutines.remove(scheduledRoutine);
+			}
 		}
 	}
 }

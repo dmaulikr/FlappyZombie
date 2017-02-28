@@ -3,6 +3,9 @@ package ve.com.edgaralexanderfr.game;
 import java.awt.Graphics;
 import java.awt.Image;
 
+import ve.com.edgaralexanderfr.net.UDPConnection;
+import ve.com.edgaralexanderfr.util.PropertiesReader;
+
 public abstract class GameObject {
 	public static final byte PIVOT_TOP_LEFT     = 0;
 	public static final byte PIVOT_TOP          = 1;
@@ -217,4 +220,72 @@ public abstract class GameObject {
 	public abstract void onTextFormatting (Graphics g);
 	public abstract void start ();
 	public abstract void update ();
+
+	protected void log (String output) {
+		System.out.println(output);
+	}
+
+	protected Resources resources () {
+		return this.game.getResources();
+	}
+
+	protected Input input () {
+		return this.game.getInput();
+	}
+
+	protected UDPConnection udpConnection () {
+		return this.game.getUDPConnection();
+	}
+
+	protected Renderer renderer () {
+		return this.game.getRenderer();
+	}
+
+	protected String configs (String property) {
+		return this.resources().get("config", PropertiesReader.class).s(property);
+	}
+
+	protected int configi (String property) {
+		return this.resources().get("config", PropertiesReader.class).i(property);
+	}
+
+	protected float configf (String property) {
+		return this.resources().get("config", PropertiesReader.class).f(property);
+	}
+
+	protected boolean isClient () {
+		return this.game.isClient();
+	}
+
+	protected boolean isServer () {
+		return this.game.isServer();
+	}
+
+	protected float deltaTime () {
+		return this.renderer().deltaTime();
+	}
+
+	protected void invoke (String name, float time, float interval, boolean repeat, ScheduledRoutineEvent scheduledRoutineEvent) {
+		this.renderer().invoke(new ScheduledRoutine(scheduledRoutineEvent, this.game.getRenderer(), name, interval, time, repeat));
+	}
+
+	protected void invoke (String name, float time, float interval, ScheduledRoutineEvent scheduledRoutineEvent) {
+		this.invoke(name, time, interval, false, scheduledRoutineEvent);
+	}
+
+	protected void invoke (String name, float interval, ScheduledRoutineEvent scheduledRoutineEvent) {
+		this.invoke(name, 0.0f, interval, scheduledRoutineEvent);
+	}
+
+	protected void invokeRepeating (String name, float time, float interval, ScheduledRoutineEvent scheduledRoutineEvent) {
+		this.invoke(name, time, interval, true, scheduledRoutineEvent);
+	}
+
+	protected void invokeRepeating (String name, float interval, ScheduledRoutineEvent scheduledRoutineEvent) {
+		this.invokeRepeating(name, 0.0f, interval, scheduledRoutineEvent);
+	}
+
+	protected void cancelInvoke (String name) {
+		this.renderer().cancelInvoke(name);
+	}
 }

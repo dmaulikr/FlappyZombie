@@ -51,7 +51,7 @@ public class Timer implements Runnable {
 	public void run () {
 		while (!this.cancelled) {
 			try {
-				this.thread.sleep(this.time);
+				Thread.sleep(this.time);
 
 				if (!this.cancelled && this.event != null) {
 					this.event.onTick(this);

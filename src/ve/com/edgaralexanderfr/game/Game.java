@@ -6,10 +6,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import ve.com.edgaralexanderfr.net.UDPClient;
+import ve.com.edgaralexanderfr.net.UDPConnection;
+import ve.com.edgaralexanderfr.net.UDPServer;
+
 public class Game {
 	private Resources resources          = null;
-	private Renderer renderer            = null;
 	private Input input                  = null;
+	private UDPConnection udpConnection  = null;
+	private Renderer renderer            = null;
 	private long lastId                  = -1;
 	private List<GameObject> gameObjects = new ArrayList<GameObject>();
 
@@ -21,6 +26,10 @@ public class Game {
 		return this.input;
 	}
 
+	public UDPConnection getUDPConnection () {
+		return this.udpConnection;
+	}
+
 	public Renderer getRenderer () {
 		return this.renderer;
 	}
@@ -29,12 +38,24 @@ public class Game {
 		return this.lastId;
 	}
 
+	public boolean isClient () {
+		return (this.udpConnection != null && this.udpConnection instanceof UDPClient);
+	}
+
+	public boolean isServer () {
+		return (this.udpConnection != null && this.udpConnection instanceof UDPServer);
+	}
+
 	public void setResources (Resources resources) {
 		this.resources = resources;
 	}
 
 	public void setInput (Input input) {
 		this.input = input;
+	}
+
+	public void setUDPConnection (UDPConnection udpConnection) {
+		this.udpConnection = udpConnection;
 	}
 
 	public void setRenderer (Renderer renderer) {
