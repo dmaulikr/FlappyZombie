@@ -1,0 +1,5 @@
+properties|config|/res/text/Config.properties
+image|level|/res/sprites/level.png
+image|survivor|/res/sprites/survivor.png
+image|zombie|/res/sprites/zombie.png
+image|bullet|/res/sprites/bullet.png

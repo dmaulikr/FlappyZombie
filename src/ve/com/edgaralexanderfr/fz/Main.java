@@ -2,34 +2,35 @@ package ve.com.edgaralexanderfr.fz;
 
 import java.awt.Image;
 
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 import ve.com.edgaralexanderfr.game.Game;
-import ve.com.edgaralexanderfr.game.GameObject;
+import ve.com.edgaralexanderfr.game.Input;
+import ve.com.edgaralexanderfr.game.Resources;
 import ve.com.edgaralexanderfr.game.Renderer;
+import ve.com.edgaralexanderfr.util.PropertiesReader;
 
 public class Main {
+	private static final String RESOURCES_FILE_PATH = "/res/text/Resources.txt";
+
 	public Main () {
-		ImageIcon imageIcon = new ImageIcon(getClass().getResource("/res/sprites/dog.png"));
-		Image image         = imageIcon.getImage();
-		Game game           = new Game();
+		Resources resources = new Resources(RESOURCES_FILE_PATH);
+		Input input         = new Input();
+		Game game           = new Game(resources, input);
 		Renderer renderer   = new Renderer(game);
-		JFrame jFrame       = new JFrame("Flappy Zombie");
+		PropertiesReader c  = resources.get("config", PropertiesReader.class);
+		JFrame jFrame       = new JFrame(c.s("windowTitle"));
 		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		jFrame.setSize(640, 360);
+		jFrame.setSize(c.i("windowWidth"), c.i("windowHeight"));
 		jFrame.setResizable(false);
 		jFrame.setLocationRelativeTo(null);
 		jFrame.add(renderer);
+		jFrame.addKeyListener(input);
 		jFrame.setVisible(true);
-
-		try {
-			Dog dog = game.instantiate(Dog.class, 0.0f, 0.0f, (short) 0, image);
-		} catch (Exception exception) {
-			exception.printStackTrace();
-		}
-		
-		renderer.start();
+		renderer.addMouseListener(input);
+		renderer.addMouseMotionListener(input);
+		game.instantiate(Level.class, 0.0f, 0.0f, (short) 0, (Image) null);
+		renderer.start((byte) c.i("fps"));
 	}
 
 	public static void main (String[] args) {
