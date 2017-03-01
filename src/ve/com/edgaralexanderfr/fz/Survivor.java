@@ -70,11 +70,11 @@ public class Survivor extends GameObject {
 		updateControls();
 	}
 
-	public void shoot (float x, float y) {
-		float targetX = this.x - 12;
-		float targetY = this.y + 7;
-		Bullet bullet = game.instantiate(Bullet.class, targetX, targetY, (short) 2, (Image) null);
-		bullet.setDirection(MathTools.angleBetween(targetX, targetY, x, y));
+	public void shoot (float targetX, float targetY) {
+		float originX = this.x - 12;
+		float originY = this.y + 7;
+		Bullet bullet = game.instantiate(Bullet.class, originX, originY, (short) 2, (Image) null);
+		bullet.setDirection(MathTools.angleBetween(originX, originY, targetX, targetY));
 	}
 
 	void updateMove () {
