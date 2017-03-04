@@ -6,27 +6,27 @@ import java.awt.Graphics;
 
 import ve.com.edgaralexanderfr.game.GameObject;
 
-public class Server extends GameObject {
-	Font font = new Font("Arial", Font.BOLD, 24);
+public class Score extends GameObject {
+	Font font   = new Font("Arial", Font.BOLD, 24);
+	Color color = new Color(94, 87, 0);
 
 	@Override
 	public void onTextFormatting (Graphics g) {
 		g.setFont(font);
-		g.setColor(Color.BLACK);
+		g.setColor(color);
 	}
 
 	@Override
 	public void start () {
 		setTextOffsetX(-20);
-		setTextOffsetY(-40);
-		setTextPivot(PIVOT_BOTTOM_RIGHT);
+		setTextOffsetY(10);
+		setTextPivot(PIVOT_TOP_RIGHT);
 		x      = configi("windowWidth");
-		y      = configi("windowHeight");
-		zIndex = 3;
+		zIndex = 500;
 	}
 
 	@Override
 	public void update () {
-		text = "127.0.0.1:55555";
+		text = "SCORE: 0";
 	}
 }

@@ -10,12 +10,15 @@ import ve.com.edgaralexanderfr.util.MathTools;
 
 public class Survivor extends GameObject {
 	Font font           = new Font("Arial", Font.BOLD, 14);
-	Color color         = new Color(43, 72, 11, 175);
+	Color playerColor   = new Color(43, 72, 11, 175);
+	Color teamMateColor = new Color(55, 83, 121, 175);
+	Color color         = teamMateColor;
 	boolean movingUp    = false;
 	boolean movingDown  = false;
 	boolean movingLeft  = false;
 	boolean movingRight = false;
-	Level level;
+	Level level         = null;
+	Pause pause         = null;
 
 	public boolean isMovingUp () {
 		return movingUp;
@@ -57,15 +60,20 @@ public class Survivor extends GameObject {
 
 	@Override
 	public void start () {
-		level = game.findGameObject(Level.class);
+		level         = game.findGameObject(Level.class);
+		pause         = game.findGameObject(Pause.class);
 		setTextOffsetY(-30);
-		x    = configi("windowWidth")  / 2;
-		y    = configi("windowHeight") / 2;
+		x             = configi("windowWidth")  / 2;
+		y             = configi("windowHeight") / 2;
 		spriteTexture = resources().get("survivor", Image.class);
 	}
 
 	@Override
 	public void update () {
+		if (pause.isPaused()) {
+			return;
+		}
+
 		updateMove();
 		updateControls();
 	}
@@ -111,42 +119,48 @@ public class Survivor extends GameObject {
 		if (y >= configi("windowHeight") - 64) {
 			y  = configi("windowHeight") - 64;
 		}
+
+		zIndex = (short) Math.round(y);
 	}
 
 	void updateControls () {
 		if (!level.isControlled(this)) {
+			color = teamMateColor;
+
 			return;
 		}
 
-		if (input().getKeyDown(configi("moveUpKeyCode"))) {
+		color = playerColor;
+
+		if (input().getKeyDown(configi("moveUpKeyCode1")) || input().getKeyDown(configi("moveUpKeyCode2"))) {
 			moveUp(true);
 		} else 
-		if (input().getKeyUp(configi("moveUpKeyCode"))) {
+		if (input().getKeyUp(configi("moveUpKeyCode1")) || input().getKeyUp(configi("moveUpKeyCode2"))) {
 			moveUp(false);
 		}
 
-		if (input().getKeyDown(configi("moveDownKeyCode"))) {
+		if (input().getKeyDown(configi("moveDownKeyCode1")) || input().getKeyDown(configi("moveDownKeyCode2"))) {
 			moveDown(true);
 		} else 
-		if (input().getKeyUp(configi("moveDownKeyCode"))) {
+		if (input().getKeyUp(configi("moveDownKeyCode1")) || input().getKeyUp(configi("moveDownKeyCode2"))) {
 			moveDown(false);
 		}
 
-		if (input().getKeyDown(configi("moveLeftKeyCode"))) {
+		if (input().getKeyDown(configi("moveLeftKeyCode1")) || input().getKeyDown(configi("moveLeftKeyCode2"))) {
 			moveLeft(true);
 		} else 
-		if (input().getKeyUp(configi("moveLeftKeyCode"))) {
+		if (input().getKeyUp(configi("moveLeftKeyCode1")) || input().getKeyUp(configi("moveLeftKeyCode2"))) {
 			moveLeft(false);
 		}
 
-		if (input().getKeyDown(configi("moveRightKeyCode"))) {
+		if (input().getKeyDown(configi("moveRightKeyCode1")) || input().getKeyDown(configi("moveRightKeyCode2"))) {
 			moveRight(true);
 		} else 
-		if (input().getKeyUp(configi("moveRightKeyCode"))) {
+		if (input().getKeyUp(configi("moveRightKeyCode1")) || input().getKeyUp(configi("moveRightKeyCode2"))) {
 			moveRight(false);
 		}
 
-		if (input().getMouseUp(1)) {
+		if (input().getMouseDown(configi("shootMouseButton")) || input().getKeyDown(configi("shootKeyCode1")) || input().getKeyDown(configi("shootKeyCode2"))) {
 			shoot(input().getMouseX(), input().getMouseY());
 		}
 	}

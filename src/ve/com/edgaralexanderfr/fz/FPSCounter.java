@@ -8,7 +8,7 @@ import ve.com.edgaralexanderfr.game.GameObject;
 
 public class FPSCounter extends GameObject {
 	Font font   = new Font("Arial", Font.BOLD, 24);
-	Color color = new Color(197, 53, 33);
+	Color color = new Color(120, 33, 20);
 
 	@Override
 	public void onTextFormatting (Graphics g) {
@@ -21,7 +21,7 @@ public class FPSCounter extends GameObject {
 		setTextOffsetX(10);
 		setTextOffsetY(10);
 		setTextPivot(PIVOT_TOP_LEFT);
-		zIndex = 3;
+		zIndex = 500;
 	}
 
 	@Override

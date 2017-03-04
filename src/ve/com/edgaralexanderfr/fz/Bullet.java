@@ -9,6 +9,7 @@ public class Bullet extends GameObject {
 	static final float SPEED = 600.0f;
 
 	float direction          = 0.0f;
+	Pause pause              = null;
 
 	public float getDirection () {
 		return direction;
@@ -27,12 +28,17 @@ public class Bullet extends GameObject {
 
 	@Override
 	public void start () {
-		zIndex        = 2;
+		pause         = game.findGameObject(Pause.class);
+		zIndex        = 499;
 		spriteTexture = resources().get("bullet", Image.class);
 	}
 
 	@Override
 	public void update () {
+		if (pause.isPaused()) {
+			return;
+		}
+
 		float deltaTime = renderer().deltaTime();
 		x              += Math.cos(direction) * SPEED * deltaTime;
 		y              += Math.sin(direction) * SPEED * deltaTime;

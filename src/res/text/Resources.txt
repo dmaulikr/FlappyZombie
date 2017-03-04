@@ -3,3 +3,4 @@ image|level|/res/sprites/level.png
 image|survivor|/res/sprites/survivor.png
 image|zombie|/res/sprites/zombie.png
 image|bullet|/res/sprites/bullet.png
+image|pausebg|/res/sprites/pausebg.png

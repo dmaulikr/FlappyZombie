@@ -7,21 +7,23 @@ import java.awt.Graphics;
 import ve.com.edgaralexanderfr.game.GameObject;
 
 public class LifeCounter extends GameObject {
-	Font font = new Font("Arial", Font.BOLD, 24);
+	Font font   = new Font("Arial", Font.BOLD, 24);
+	Color color = new Color(120, 33, 20);
 
 	@Override
 	public void onTextFormatting (Graphics g) {
 		g.setFont(font);
-		g.setColor(Color.BLACK);
+		g.setColor(color);
 	}
 
 	@Override
 	public void start () {
 		setTextOffsetX(-20);
-		setTextOffsetY(10);
-		setTextPivot(PIVOT_TOP_RIGHT);
+		setTextOffsetY(-40);
+		setTextPivot(PIVOT_BOTTOM_RIGHT);
 		x      = configi("windowWidth");
-		zIndex = 3;
+		y      = configi("windowHeight");
+		zIndex = 500;
 	}
 
 	@Override

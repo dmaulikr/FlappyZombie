@@ -15,17 +15,16 @@ import javax.swing.Timer;
 import ve.com.edgaralexanderfr.util.GraphicsTools;
 
 public class Renderer extends JPanel implements ActionListener {
-	public static final long serialVersionUID        = 42l;
+	public static final long serialVersionUID = 42l;
 
-	private Game game                                = null;
-	private long lastFrameTime                       = -1;
-	private long currentFrameTime                    = 0;
-	private float fpsElapsedTime                     = 0.0f;
-	private int frameCount                           = 0;
-	private int fps                                  = 0;
-	private Timer timer                              = null;
-	private short time                               = (short) Math.round(1000 / 24);
-	private List<ScheduledRoutine> scheduledRoutines = new ArrayList<ScheduledRoutine>();
+	private Game game                         = null;
+	private long lastFrameTime                = -1;
+	private long currentFrameTime             = 0;
+	private float fpsElapsedTime              = 0.0f;
+	private int frameCount                    = 0;
+	private int fps                           = 0;
+	private Timer timer                       = null;
+	private short time                        = (short) Math.round(1000 / 24);
 
 	public Game getGame () {
 		return this.game;
@@ -86,7 +85,7 @@ public class Renderer extends JPanel implements ActionListener {
 
 		this.currentFrameTime    = ve.com.edgaralexanderfr.util.Timer.now();
 		this.fpsElapsedTime     += this.deltaTime();
-		this.updateScheduledRoutines();
+		this.game.updateScheduledRoutines();
 		this.game.update();
 		this.lastFrameTime       = this.currentFrameTime;
 		GameObject[] gameObjects = this.game.getSortedGameObjects();
@@ -154,35 +153,6 @@ public class Renderer extends JPanel implements ActionListener {
 		if (this.timer != null) {
 			this.timer.stop();
 			this.timer = null;
-		}
-	}
-
-	public synchronized void invoke (ScheduledRoutine scheduledRoutine) {
-		if (scheduledRoutine != null) {
-			this.scheduledRoutines.add(scheduledRoutine);
-		}
-	}
-
-	public synchronized void cancelInvoke (String name) {
-		for (ScheduledRoutine scheduledRoutine : this.scheduledRoutines) {
-			if (scheduledRoutine.getName().equals(name)) {
-				this.scheduledRoutines.remove(scheduledRoutine);
-
-				break;
-			}
-		}
-	}
-
-	private synchronized void updateScheduledRoutines () {
-		ScheduledRoutine[] scheduledRoutines = new ScheduledRoutine[ this.scheduledRoutines.size() ];
-		this.scheduledRoutines.toArray(scheduledRoutines);
-
-		for (ScheduledRoutine scheduledRoutine : scheduledRoutines) {
-			scheduledRoutine.update();
-
-			if (scheduledRoutine.isCompleted()) {
-				this.scheduledRoutines.remove(scheduledRoutine);
-			}
 		}
 	}
 }

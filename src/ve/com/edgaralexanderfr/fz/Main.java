@@ -30,6 +30,7 @@ public class Main {
 		jFrame.setLocationRelativeTo(null);
 		jFrame.add(renderer);
 		jFrame.addKeyListener(input);
+		jFrame.setIconImage(resources.get("zombie", Image.class));
 		jFrame.setVisible(true);
 	}
 

@@ -266,7 +266,7 @@ public abstract class GameObject {
 	}
 
 	protected void invoke (String name, float time, float interval, boolean repeat, ScheduledRoutineEvent scheduledRoutineEvent) {
-		this.renderer().invoke(new ScheduledRoutine(scheduledRoutineEvent, this.game.getRenderer(), name, interval, time, repeat));
+		this.game.invoke(new ScheduledRoutine(scheduledRoutineEvent, this.game.getRenderer(), name, interval, time, repeat));
 	}
 
 	protected void invoke (String name, float time, float interval, ScheduledRoutineEvent scheduledRoutineEvent) {
@@ -286,6 +286,6 @@ public abstract class GameObject {
 	}
 
 	protected void cancelInvoke (String name) {
-		this.renderer().cancelInvoke(name);
+		this.game.cancelInvoke(name);
 	}
 }

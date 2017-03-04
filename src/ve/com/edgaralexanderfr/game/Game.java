@@ -11,12 +11,14 @@ import ve.com.edgaralexanderfr.net.UDPConnection;
 import ve.com.edgaralexanderfr.net.UDPServer;
 
 public class Game {
-	private Resources resources          = null;
-	private Input input                  = null;
-	private UDPConnection udpConnection  = null;
-	private Renderer renderer            = null;
-	private long lastId                  = -1;
-	private List<GameObject> gameObjects = new ArrayList<GameObject>();
+	private Resources resources                      = null;
+	private Input input                              = null;
+	private UDPConnection udpConnection              = null;
+	private Renderer renderer                        = null;
+	private long lastId                              = -1;
+	private List<GameObject> gameObjects             = new ArrayList<GameObject>();
+	private List<ScheduledRoutine> scheduledRoutines = new ArrayList<ScheduledRoutine>();
+	private boolean scheduledRoutinesPaused          = false;
 
 	public Resources getResources () {
 		return this.resources;
@@ -36,6 +38,10 @@ public class Game {
 
 	public long getLastId () {
 		return this.lastId;
+	}
+
+	public boolean areScheduledRoutinesPaused () {
+		return this.scheduledRoutinesPaused;
 	}
 
 	public boolean isClient () {
@@ -60,6 +66,10 @@ public class Game {
 
 	public void setRenderer (Renderer renderer) {
 		this.renderer = renderer;
+	}
+
+	public void pauseScheduledRoutines (boolean scheduledRoutinesPaused) {
+		this.scheduledRoutinesPaused = scheduledRoutinesPaused;
 	}
 
 	public Game (Resources resources, Input input) {
@@ -180,6 +190,39 @@ public class Game {
 				this.gameObjects.remove(i);
 
 				break;
+			}
+		}
+	}
+
+	public synchronized void invoke (ScheduledRoutine scheduledRoutine) {
+		if (scheduledRoutine != null) {
+			this.scheduledRoutines.add(scheduledRoutine);
+		}
+	}
+
+	public synchronized void cancelInvoke (String name) {
+		for (ScheduledRoutine scheduledRoutine : this.scheduledRoutines) {
+			if (scheduledRoutine.getName().equals(name)) {
+				this.scheduledRoutines.remove(scheduledRoutine);
+
+				break;
+			}
+		}
+	}
+
+	public synchronized void updateScheduledRoutines () {
+		if (this.scheduledRoutinesPaused) {
+			return;
+		}
+
+		ScheduledRoutine[] scheduledRoutines = new ScheduledRoutine[ this.scheduledRoutines.size() ];
+		this.scheduledRoutines.toArray(scheduledRoutines);
+
+		for (ScheduledRoutine scheduledRoutine : scheduledRoutines) {
+			scheduledRoutine.update();
+
+			if (scheduledRoutine.isCompleted()) {
+				this.scheduledRoutines.remove(scheduledRoutine);
 			}
 		}
 	}
