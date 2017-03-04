@@ -3,7 +3,11 @@ package ve.com.edgaralexanderfr.fz;
 import java.awt.Graphics;
 import java.awt.Image;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ve.com.edgaralexanderfr.game.GameObject;
+import ve.com.edgaralexanderfr.util.MathTools;
 
 public class Bullet extends GameObject {
 	static final float SPEED = 600.0f;
@@ -39,11 +43,29 @@ public class Bullet extends GameObject {
 			return;
 		}
 
-		float deltaTime = renderer().deltaTime();
-		x              += Math.cos(direction) * SPEED * deltaTime;
-		y              += Math.sin(direction) * SPEED * deltaTime;
+		updateMove();
+	}
 
-		if (x <= 64 || x >= configi("windowWidth") - 64 || y <= 64 || y >= configi("windowHeight") - 64) {
+	void updateMove () {
+		float deltaTime      = renderer().deltaTime();
+		float nextX          = (float) (x + Math.cos(direction) * SPEED * deltaTime);
+		float nextY          = (float) (y + Math.sin(direction) * SPEED * deltaTime);
+		List<Zombie> zombies = game.findGameObjects(Zombie.class);
+		boolean collided     = false;
+
+		for (Zombie zombie : zombies) {
+			if (MathTools.lineIntersectsRectangle(x, y, nextX, nextY, zombie.getX() - 16, zombie.getY() - 16, 32, 32)) {
+				zombie.destroy();
+				collided = true;
+
+				break;
+			}
+		}
+
+		x = nextX;
+		y = nextY;
+
+		if (collided || x <= 64 || x >= configi("windowWidth") - 64 || y <= 64 || y >= configi("windowHeight") - 64) {
 			destroy();
 		}
 	}
