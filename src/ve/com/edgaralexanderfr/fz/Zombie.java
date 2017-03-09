@@ -11,14 +11,16 @@ import java.util.List;
 import ve.com.edgaralexanderfr.game.GameObject;
 import ve.com.edgaralexanderfr.game.ScheduledRoutine;
 import ve.com.edgaralexanderfr.game.ScheduledRoutineEvent;
+import ve.com.edgaralexanderfr.util.MathTools;
 
 public class Zombie extends GameObject implements ScheduledRoutineEvent {
-	Font font     = new Font("Arial", Font.BOLD, 14);
-	Color color   = new Color(55, 83, 121, 175);
-	Level level   = null;
-	Pause pause   = null;
-	float targetX = 0;
-	float targetY = 0;
+	Font font       = new Font("Arial", Font.BOLD, 14);
+	Color color     = new Color(237, 46, 35, 175);
+	Level level     = null;
+	float targetX   = 0;
+	float targetY   = 0;
+	float previousX = 0;
+	float previousY = 0;
 
 	public float getTargetX () {
 		return targetX;
@@ -26,6 +28,14 @@ public class Zombie extends GameObject implements ScheduledRoutineEvent {
 
 	public float getTargetY () {
 		return targetY;
+	}
+
+	public float getPreviousX () {
+		return previousX;
+	}
+
+	public float getPreviousY () {
+		return previousY;
 	}
 
 	public void setTargetX (float targetX) {
@@ -45,7 +55,6 @@ public class Zombie extends GameObject implements ScheduledRoutineEvent {
 	@Override
 	public void start () {
 		level         = game.findGameObject(Level.class);
-		pause         = game.findGameObject(Pause.class);
 		setTextOffsetY(-30);
 		boolean h     = (Math.random() < 0.5f);
 		x             = (h) ? Math.round(64 + (Math.random() * (configi("windowWidth") - 128))) : ((Math.random() < 0.5f) ? 64 : configi("windowWidth") - 64 ) ;
@@ -59,11 +68,12 @@ public class Zombie extends GameObject implements ScheduledRoutineEvent {
 
 	@Override
 	public void update () {
-		if (pause.isPaused()) {
+		if (level.getPause().isPaused()) {
 			return;
 		}
 
 		updateMove();
+		hurtSurvivors();
 	}
 
 	@Override
@@ -73,8 +83,15 @@ public class Zombie extends GameObject implements ScheduledRoutineEvent {
 		}
 	}
 
+	public void kill () {
+		level.getScore().increase();
+		destroy();
+	}
+
 	void updateMove () {
 		float deltaTime = deltaTime();
+		previousX       = x;
+		previousY       = y;
 
 		if (x < targetX) {
 			x = Math.min(x + (200 * deltaTime), targetX);
@@ -91,6 +108,16 @@ public class Zombie extends GameObject implements ScheduledRoutineEvent {
 		}
 
 		zIndex = (short) Math.round(y);
+	}
+
+	void hurtSurvivors () {
+		List<Survivor> survivors = game.findGameObjects(Survivor.class);
+
+		for (Survivor survivor : survivors) {
+			if (MathTools.lineIntersectsRectangle(previousX, previousY, x, y, survivor.getX() - 16, survivor.getY() - 16, 32, 32)) {
+				survivor.hurt();
+			}
+		}
 	}
 
 	void updateTargetPos () {

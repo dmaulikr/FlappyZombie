@@ -13,7 +13,7 @@ public class Bullet extends GameObject {
 	static final float SPEED = 600.0f;
 
 	float direction          = 0.0f;
-	Pause pause              = null;
+	Level level              = null;
 
 	public float getDirection () {
 		return direction;
@@ -32,14 +32,14 @@ public class Bullet extends GameObject {
 
 	@Override
 	public void start () {
-		pause         = game.findGameObject(Pause.class);
+		level         = game.findGameObject(Level.class);
 		zIndex        = 499;
 		spriteTexture = resources().get("bullet", Image.class);
 	}
 
 	@Override
 	public void update () {
-		if (pause.isPaused()) {
+		if (level.getPause().isPaused()) {
 			return;
 		}
 
@@ -55,7 +55,7 @@ public class Bullet extends GameObject {
 
 		for (Zombie zombie : zombies) {
 			if (MathTools.lineIntersectsRectangle(x, y, nextX, nextY, zombie.getX() - 16, zombie.getY() - 16, 32, 32)) {
-				zombie.destroy();
+				zombie.kill();
 				collided = true;
 
 				break;

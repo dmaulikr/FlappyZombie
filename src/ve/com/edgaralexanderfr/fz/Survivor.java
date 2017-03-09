@@ -6,19 +6,22 @@ import java.awt.Graphics;
 import java.awt.Image;
 
 import ve.com.edgaralexanderfr.game.GameObject;
+import ve.com.edgaralexanderfr.game.ScheduledRoutine;
+import ve.com.edgaralexanderfr.game.ScheduledRoutineEvent;
 import ve.com.edgaralexanderfr.util.MathTools;
 
-public class Survivor extends GameObject {
+public class Survivor extends GameObject implements ScheduledRoutineEvent {
 	Font font           = new Font("Arial", Font.BOLD, 14);
 	Color playerColor   = new Color(43, 72, 11, 175);
 	Color teamMateColor = new Color(55, 83, 121, 175);
 	Color color         = teamMateColor;
+	Level level         = null;
 	boolean movingUp    = false;
 	boolean movingDown  = false;
 	boolean movingLeft  = false;
 	boolean movingRight = false;
-	Level level         = null;
-	Pause pause         = null;
+	float life          = 1.0f;
+	boolean wounded     = false;
 
 	public boolean isMovingUp () {
 		return movingUp;
@@ -34,6 +37,14 @@ public class Survivor extends GameObject {
 
 	public boolean isMovingRight () {
 		return movingRight;
+	}
+
+	public float getLife () {
+		return life;
+	}
+
+	public boolean isWounded () {
+		return wounded;
 	}
 
 	public void moveUp (boolean movingUp) {
@@ -61,16 +72,16 @@ public class Survivor extends GameObject {
 	@Override
 	public void start () {
 		level         = game.findGameObject(Level.class);
-		pause         = game.findGameObject(Pause.class);
 		setTextOffsetY(-30);
 		x             = configi("windowWidth")  / 2;
 		y             = configi("windowHeight") / 2;
 		spriteTexture = resources().get("survivor", Image.class);
+		invokeRepeating("heal" + this.id, 5.0f, this);
 	}
 
 	@Override
 	public void update () {
-		if (pause.isPaused()) {
+		if (level.getPause().isPaused()) {
 			return;
 		}
 
@@ -78,11 +89,48 @@ public class Survivor extends GameObject {
 		updateControls();
 	}
 
+	@Override
+	public void onIntervalReached (ScheduledRoutine scheduledRoutine) {
+		if (scheduledRoutine.getName().equals("recover" + this.id)) {
+			wounded = false;
+		} else 
+		if (scheduledRoutine.getName().equals("heal" + this.id) && !wounded) {
+			life = Math.min(life + 0.25f, 1.0f);
+		}
+	}
+
+	@Override
+	public void destroy () {
+		cancelInvoke("heal"    + this.id);
+		cancelInvoke("recover" + this.id);
+		super.destroy();
+	}
+
 	public void shoot (float targetX, float targetY) {
 		float originX = this.x - 12;
 		float originY = this.y + 7;
 		Bullet bullet = game.instantiate(Bullet.class, originX, originY, (short) 2, (Image) null);
 		bullet.setDirection(MathTools.angleBetween(originX, originY, targetX, targetY));
+	}
+
+	public void hurt () {
+		if (wounded) {
+			return;
+		}
+
+		wounded = true;
+		life    = Math.max(life - 0.25f, 0.0f);
+
+		if (life > 0) {
+			invoke("recover" + this.id, 2.0f, this);
+		} else {
+			kill();
+		}
+	}
+
+	public void kill () {
+		level.spawnZombie(this.text, this.x, this.y);
+		destroy();
 	}
 
 	void updateMove () {
@@ -131,6 +179,7 @@ public class Survivor extends GameObject {
 		}
 
 		color = playerColor;
+		level.getLifeCounter().setLife((byte) Math.round(life * 100));
 
 		if (input().getKeyDown(configi("moveUpKeyCode1")) || input().getKeyDown(configi("moveUpKeyCode2"))) {
 			moveUp(true);

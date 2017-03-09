@@ -9,6 +9,17 @@ import ve.com.edgaralexanderfr.game.GameObject;
 public class LifeCounter extends GameObject {
 	Font font   = new Font("Arial", Font.BOLD, 24);
 	Color color = new Color(120, 33, 20);
+	byte life   = 100;
+
+	public byte getLife () {
+		return life;
+	}
+
+	public void setLife (byte life) {
+		if (life >= 0 && life <= 100) {
+			this.life = life;
+		}
+	}
 
 	@Override
 	public void onTextFormatting (Graphics g) {
@@ -28,6 +39,6 @@ public class LifeCounter extends GameObject {
 
 	@Override
 	public void update () {
-		text = "LIFE: 100";
+		text = "LIFE: " + life;
 	}
 }

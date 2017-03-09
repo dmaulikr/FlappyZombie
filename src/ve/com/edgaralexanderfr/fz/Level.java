@@ -15,6 +15,26 @@ public class Level extends GameObject implements ScheduledRoutineEvent {
 	Pause pause               = null;
 	long controlledSurvivorId = -1;
 
+	public FPSCounter getFPSCounter () {
+		return fpsCounter;
+	}
+
+	public Score getScore () {
+		return score;
+	}
+
+	public Ping getPing () {
+		return ping;
+	}
+
+	public LifeCounter getLifeCounter () {
+		return lifeCounter;
+	}
+
+	public Pause getPause () {
+		return pause;
+	}
+
 	@Override
 	public void onTextFormatting (Graphics g) {
 
@@ -30,7 +50,7 @@ public class Level extends GameObject implements ScheduledRoutineEvent {
 		lifeCounter          = game.instantiate(LifeCounter.class, 0, 0, (short) 0, (Image) null);
 		pause                = game.instantiate(Pause.class, 0, 0, (short) 0, (Image) null);
 		controlledSurvivorId = spawnSurvivor("Edgar Alexander").getId();
-		invokeRepeating("spawnZombie", 1, this);
+		invokeRepeating("spawnZombie", 0.5f, this);
 	}
 
 	@Override
@@ -49,8 +69,24 @@ public class Level extends GameObject implements ScheduledRoutineEvent {
 		return game.instantiate(Survivor.class, 0, 0, (short) 0, name);
 	}
 
+	public Survivor spawnSurvivor (String name, float x, float y) {
+		Survivor survivor = spawnSurvivor(name);
+		survivor.setX(x);
+		survivor.setY(y);
+
+		return survivor;
+	}
+
 	public Zombie spawnZombie (String name) {
 		return game.instantiate(Zombie.class, 0, 0, (short) 0, name);
+	}
+
+	public Zombie spawnZombie (String name, float x, float y) {
+		Zombie zombie = spawnZombie(name);
+		zombie.setX(x);
+		zombie.setY(y);
+
+		return zombie;
 	}
 
 	public boolean isControlled (Survivor survivor) {
