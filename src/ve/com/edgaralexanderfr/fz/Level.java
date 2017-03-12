@@ -85,6 +85,8 @@ public class Level extends GameObject implements ScheduledRoutineEvent {
 		Zombie zombie = spawnZombie(name);
 		zombie.setX(x);
 		zombie.setY(y);
+		zombie.setTargetX(x);
+		zombie.setTargetY(y);
 
 		return zombie;
 	}

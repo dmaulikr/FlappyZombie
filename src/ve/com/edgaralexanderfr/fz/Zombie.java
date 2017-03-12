@@ -62,7 +62,7 @@ public class Zombie extends GameObject implements ScheduledRoutineEvent {
 		spriteTexture = resources().get("zombie", Image.class);
 		targetX       = x;
 		targetY       = y;
-		invokeRepeating("updateTargetPos" + this.id, 3, this);
+		invokeRepeating("updateTargetPos" + id, 3, this);
 		updateTargetPos();
 	}
 
@@ -73,17 +73,18 @@ public class Zombie extends GameObject implements ScheduledRoutineEvent {
 		}
 
 		updateMove();
-		hurtSurvivors();
+		killSurvivors();
 	}
 
 	@Override
 	public void onIntervalReached (ScheduledRoutine scheduledRoutine) {
-		if (scheduledRoutine.getName().equals("updateTargetPos" + this.id)) {
+		if (scheduledRoutine.getName().equals("updateTargetPos" + id)) {
 			updateTargetPos();
 		}
 	}
 
 	public void kill () {
+		cancelInvoke("updateTargetPos" + id);
 		level.getScore().increase();
 		destroy();
 	}
@@ -110,12 +111,12 @@ public class Zombie extends GameObject implements ScheduledRoutineEvent {
 		zIndex = (short) Math.round(y);
 	}
 
-	void hurtSurvivors () {
+	void killSurvivors () {
 		List<Survivor> survivors = game.findGameObjects(Survivor.class);
 
 		for (Survivor survivor : survivors) {
 			if (MathTools.lineIntersectsRectangle(previousX, previousY, x, y, survivor.getX() - 16, survivor.getY() - 16, 32, 32)) {
-				survivor.hurt();
+				survivor.kill();
 			}
 		}
 	}
